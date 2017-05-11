@@ -24,7 +24,7 @@ class AssertStatementTest {
             }
         '''
         */
-        def src = 'assert 1 } 2'
+        def src = 'assert 1 == 2'
         def srcUnit = SourceUnit.create('dummy', src)
         parse(srcUnit)
         def ast = srcUnit.getAST()
