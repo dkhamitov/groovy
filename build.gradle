@@ -406,8 +406,9 @@ task bootstrapJar {
     dependsOn compileJava, dgmConverter
 
     def destinationDir = file("$buildDir/bootstrap")
-    def archiveName = "groovy-${version}-bootstrap.jar"
-    ext.archivePath = file("$destinationDir/$archiveName")
+    def namePrefix = "groovy-${version}-bootstrap"
+    def archivePath = file("$destinationDir/${namePrefix}.jar")
+    def archiveSourcesPath = file("$destinationDir/${namePrefix}-sources.jar")
 
     doLast {
         // we use ant.jar because Gradle is a bit "too smart" with JavaExec
@@ -418,10 +419,17 @@ task bootstrapJar {
                 destfile: archivePath,
                 basedir: file(sourceSets.main.output.classesDir)
         )
+        ant.jar(destfile: archiveSourcesPath) {
+            fileset(dir: 'src/main') {
+                include(name: '**/**.java')
+            }
+            fileset(dir: "$buildDir/generated-sources/src/main")
+        }
     }
     inputs.property('indy', useIndy())
     inputs.files sourceSets.main.allJava
-    outputs.file archivePath
+    ext.archivePath = archivePath
+    outputs.files(archivePath, archiveSourcesPath)
 }
 
 compileGroovy.dependsOn bootstrapJar
